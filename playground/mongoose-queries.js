@@ -8,7 +8,7 @@ User.findById(userId).then((user) => {
     if (!user) {
         return console.log('---------------> USER ID NOT FOUND.');
     }
-    console.log('User by Id', JSON.stringify(user, undefined, 2));;
+    console.log('User by Id', JSON.stringify(user, undefined, 2));
 }).catch((e) => console.log(e));
 
 // var id = '5ba6ee4d0c86d3adaa0fd14811';
