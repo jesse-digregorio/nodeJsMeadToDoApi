@@ -58,6 +58,7 @@ app.delete('/todos/:id', (req, res) => {
     // get id
     // validate id, not valid = 404
     var {id} = req.params;
+    console.log('DELETE /todo/:id');
 
     if (!ObjectID.isValid(id)) {
         console.error(`Invalid Id: DELETE /todos/${id}`);
