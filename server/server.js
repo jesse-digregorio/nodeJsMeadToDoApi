@@ -1,3 +1,5 @@
+require('./config/config');
+
 const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -41,7 +43,7 @@ app.get('/todos/:id', (req, res) => {
         // console.error(`Invalid Id: GET /todos/${id}`);
         return res.status(404).send();
     }
-    
+
     Todo.findById(id).then((todo) => {
         if (!todo) {
             // console.log('Id not found.');
@@ -63,7 +65,7 @@ app.delete('/todos/:id', (req, res) => {
         // console.error(`Invalid Id: DELETE /todos/${id}`);
         return res.status(404).send();
     }
-    
+
     Todo.findByIdAndRemove(id).then((todo) => {
         if (!todo) {
             // console.log('Unable to remove. Id not found.');
@@ -92,7 +94,7 @@ app.patch('/todos/:id', (req, res) => {
         body.completedAt = null;
     }
 
-    Todo.findByIdAndUpdate(id, 
+    Todo.findByIdAndUpdate(id,
         { $set: body },
         { new: true }
     ).then((todo) => {
@@ -100,7 +102,7 @@ app.patch('/todos/:id', (req, res) => {
             return res.status(404).send();
         }
 
-        res.send({todo}); 
+        res.send({todo});
     }).catch((e) => {
         res.sgtatus(400).send();
     });
