@@ -33,6 +33,7 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
+// Using ".methods" adds methods to instances of this schema.
 UserSchema.methods.toJSON = function () {
     var user = this;
     var userObject = user.toObject();
@@ -55,7 +56,18 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
-// add methods to the model.
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+
+    return user.update({
+        $pull: {
+            tokens: { token }
+        }
+    });
+};
+
+
+// using ".statics" adds mentods to the schema model.
 UserSchema.statics.findByToken = function (token) {
     var User = this;
     var decoded;
@@ -115,7 +127,6 @@ UserSchema.pre('save', function (next) {
         next();
     }
 });
-
 
 
 
