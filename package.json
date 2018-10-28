@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/server.js",
+    "start-watch": "nodemon server/server.js",
     "test": "export NODE_ENV=test || SET \"NODE_END=test\" && mocha server/**/*.test.js --timeout=3000",
     "test-watch": "nodemon --exec 'npm test'"
   },
