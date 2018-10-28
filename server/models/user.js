@@ -9,19 +9,17 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minLength: 1,
+        minlength: 1,
         unique: true,
         validate: {
-            validator: (value) => {
-                validator.isEmail(value);
-            },
+            validator: validator.isEmail,
             message: '{VALUE} is not a valid email'
         }
     },
     password: {
         type: String,
         require: true,
-        minLength: 6
+        minlength: 6
     },
     tokens: [{
         access: {
@@ -64,15 +62,15 @@ UserSchema.statics.findByToken = function (token) {
 
     try {
         decoded = jwt.verify(token, 'abc123');
-        console.log('DECODED', decoded);
+        // console.log('DECODED', decoded);
     } catch (e) {
-        console.log('BUGGER: ', e);
+        // console.log('BUGGER: ', e);
         return Promise.reject();;
     }
 
-    console.log('_id: ', decoded._id);
-    console.log('tokens.token: ', token);
-    console.log('tokens.access: ', 'auth');
+    // console.log('_id: ', decoded._id);
+    // console.log('tokens.token: ', token);
+    // console.log('tokens.access: ', 'auth');
 
     return User.findOne({
         '_id': decoded._id,

@@ -117,7 +117,6 @@ app.get('/users/me', authenticate, (req, res) => {
 // POST /users
 app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
-    console.log('BODY:', body);
     var user = new User(body);
 
     user.save().then(() => {
@@ -126,7 +125,6 @@ app.post('/users', (req, res) => {
     }).then((token) => {
         res.header('x-auth', token).send(user);
     }).catch((e) => {
-        console.log('SOME DAMN THING IS BROKEN');
         res.status(400).send(e);
     })
 });

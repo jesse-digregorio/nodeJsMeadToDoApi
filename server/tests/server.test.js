@@ -4,22 +4,17 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
+const {
+    testTodos,
+    populateTodos,
+    testUsers,
+    populateUsers
+    } = require('./seed/seed');
 
-const testTodos = [
-    { _id: new ObjectID(), text: 'first todo'},
-    { _id: new ObjectID(), text: 'second todo'},
-    { _id: new ObjectID(), text: 'thrid todo',
-                          completed: true,
-                          completedAt: 333 }
-];
 
-beforeEach((done) => {
-    Todo.remove({}).then(() => {
-        return Todo.insertMany(testTodos);
-    }).then(
-        () => { done(); }
-    )
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe('POST /todos', () => {
 
@@ -78,7 +73,7 @@ describe('GET /todos', () => {
             })
             .end(done);
     });
-});
+}); //GET /todos
 
 describe('GET /todos/:id', () => {
     it('should return todo doc', (done) => {
@@ -109,7 +104,7 @@ describe('GET /todos/:id', () => {
             .expect(404)
             .end(done);
     });
-});
+}); //GET /todos/:id
 
 describe('DELETE /todos/:id', () => {
     it('should remove a todo doc', (done) => {
@@ -149,7 +144,7 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 
-});
+}); //DELETE /todos/:id
 
 describe('PATCH /todos/:id', () => {
     it('should update the todo', (done) => {
@@ -183,5 +178,84 @@ describe('PATCH /todos/:id', () => {
                 done();
             }).catch((e) => done(e));
         });
+    }); //PATCH /todos/:id
 
-});
+    describe('GET /users/me', () => {
+        it('should return user if authenticated', (done) => {
+            request(app)
+                .get('/users/me')
+                .set('x-auth', testUsers[0].tokens[0].token)
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body._id).toBe(testUsers[0]._id.toHexString());
+                    expect(res.body.email).toBe(testUsers[0].email);
+                })
+                .end(done);
+        });
+
+        it('should return 401 if not authenticated', (done) => {
+            request(app)
+                .get('/users/me')
+                .expect(401)
+                .expect((res) => {
+                    expect(res.body).toEqual({});
+                })
+                .end(done);
+        });
+    }); //GET /users/me
+
+    describe('POST /users', () => {
+        it('should create a user', (done) => {
+            var email = 'example@example.com';
+            var password = '123mnb!';
+            var requestData = { email, password };
+
+            request(app)
+                .post('/users')
+                // .send({email, password})
+                .send(requestData)
+                .expect(200)
+                .expect((res) => {
+                    expect(res.headers['x-auth']).toExist();
+                    expect(res.body._id).toExist();
+                    expect(res.body.email).toBe(email);
+                })
+                .end((err) => {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    User.findOne({email}).then((user) => {
+                        expect(user).toExist();
+                        expect(user.password).toNotBe(password);
+                        done();
+                    })
+                    .catch((e) => {console.log('CAUGHT: ', e)});
+                });
+        });
+
+        it('should return validation errors if request is invalid', (done) => {
+            var email = 'example';
+            var password = '123';   // password is too short
+            var requestData = { email, password };
+
+            request(app)
+                .post('/users')
+                .send(requestData)
+                .expect(400)
+                .end(done);
+        });
+
+        it('should not create user if email in use', (done) => {
+            var email = testUsers[0].email; // email is in use
+            var password = 'mnb123!';
+            var requestData = { email, password };
+
+            request(app)
+                .post('/users')
+                .send(requestData)
+                .expect(400)
+                .end(done);
+        });
+
+}); //POST /users
