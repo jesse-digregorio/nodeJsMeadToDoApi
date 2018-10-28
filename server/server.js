@@ -133,7 +133,7 @@ app.post('/users', (req, res) => {
 app.post('/users/login', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
 
-    console.log('/users/login - BODY: ', body);
+    // console.log('/users/login - BODY: ', body);
 
     User.findByCredentials(body.email, body.password).then((user) => {
         return user.generateAuthToken().then((token) => {
